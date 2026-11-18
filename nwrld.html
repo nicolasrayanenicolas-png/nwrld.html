@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MaisonCI | Trouvez une maison en Côte d'Ivoire</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --orange: #f77f00;
+      --vert: #009e60;
+      --vert-fonce: #046b43;
+      --fond: #f6f8f7;
+      --texte: #1f2937;
+    }
+
+    body {
+      font-family: "Segoe UI", Arial, sans-serif;
+      background: var(--fond);
+      color: var(--texte);
+      line-height: 1.5;
+    }
+
+    /* ---------- Menu ---------- */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 6%;
+      background: white;
+      box-shadow: 0 2px 12px rgba(0,0,0,.08);
+    }
+    .logo { font-size: 1.6rem; font-weight: 800; color: var(--vert); }
+    .logo span { color: var(--orange); }
+    .fav-lien {
+      font-weight: 600;
+      color: var(--texte);
+      cursor: pointer;
+      background: none;
+      border: 2px solid var(--vert);
+      border-radius: 50px;
+      padding: 8px 18px;
+      transition: .25s;
+    }
+    .fav-lien:hover { background: var(--vert); color: white; }
+
+    /* ---------- Bannière ---------- */
+    .hero {
+      padding: 80px 6% 110px;
+      text-align: center;
+      color: white;
+      background:
+        linear-gradient(rgba(4,107,67,.78), rgba(4,107,67,.78)),
+        url("https://picsum.photos/id/1067/1600/800") center/cover;
+    }
+    .hero h1 { font-size: clamp(1.9rem, 5vw, 3.2rem); margin-bottom: 12px; }
+    .hero p { font-size: 1.1rem; max-width: 650px; margin: 0 auto; }
+
+    /* ---------- Barre de recherche ---------- */
+    .recherche {
+      max-width: 1100px;
+      margin: -60px auto 0;
+      padding: 24px;
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0,0,0,.15);
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 14px;
+      position: relative;
+      z-index: 5;
+    }
+    .recherche label {
+      display: block;
+      font-size: .8rem;
+      font-weight: 700;
+      color: #6b7280;
+      margin-bottom: 4px;
+      text-transform: uppercase;
+    }
+    .recherche select, .recherche input {
+      width: 100%;
+      padding: 12px;
+      border: 2px solid #e5e7eb;
+      border-radius: 10px;
+      font-size: 1rem;
+      font-family: inherit;
+      background: white;
+    }
+    .recherche select:focus, .recherche input:focus {
+      outline: none;
+      border-color: var(--vert);
+    }
+    .btn-reset {
+      grid-column: 1 / -1;
+      justify-self: end;
+      background: none;
+      border: none;
+      color: var(--orange);
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    /* ---------- Résultats ---------- */
+    main { max-width: 1200px; margin: 40px auto; padding: 0 5%; }
+    .barre-resultats {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 24px;
+    }
+    .barre-resultats h2 { font-size: 1.3rem; }
+    .barre-resultats select {
+      padding: 10px;
+      border: 2px solid #e5e7eb;
+      border-radius: 10px;
+      font-size: .95rem;
+    }
+
+    .grille {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 26px;
+    }
+    .carte {
+      background: white;
+      border-radius: 18px;
+      overflow: hidden;
+      box-shadow: 0 6px 20px rgba(0,0,0,.08);
+      transition: transform .3s, box-shadow .3s;
+      animation: monte .6s ease both;
+      position: relative;
+    }
+    .carte:hover { transform: translateY(-8px); box-shadow: 0 16px 32px rgba(0,0,0,.15); }
+    .carte img { width: 100%; height: 200px; object-fit: cover; display: block; }
+    .badge {
+      position: absolute;
+      top: 12px; left: 12px;
+      padding: 5px 14px;
+      border-radius: 50px;
+      color: white;
+      font-size: .8rem;
+      font-weight: 700;
+    }
+    .badge.achat { background: var(--vert); }
+    .badge.location { background: var(--orange); }
+    .coeur {
+      position: absolute;
+      top: 8px; right: 10px;
+      font-size: 1.6rem;
+      background: rgba(255,255,255,.9);
+      border: none;
+      border-radius: 50%;
+      width: 40px; height: 40px;
+      cursor: pointer;
+      transition: transform .2s;
+    }
+    .coeur:hover { transform: scale(1.2); }
+    .contenu { padding: 18px; }
+    .contenu h3 { font-size: 1.1rem; margin-bottom: 2px; }
+    .lieu { color: #6b7280; font-size: .92rem; }
+    .prix { margin: 8px 0; font-size: 1.25rem; font-weight: 800; color: var(--vert-fonce); }
+    .infos { display: flex; gap: 14px; font-size: .88rem; color: #4b5563; margin-bottom: 14px; flex-wrap: wrap; }
+    .btn {
+      display: inline-block;
+      width: 100%;
+      text-align: center;
+      padding: 11px;
+      border-radius: 50px;
+      background: var(--orange);
+      color: white;
+      font-weight: 700;
+      text-decoration: none;
+      transition: .25s;
+    }
+    .btn:hover { background: #d96d00; transform: scale(1.03); }
+
+    .vide {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 60px 20px;
+      color: #6b7280;
+      font-size: 1.1rem;
+    }
+
+    /* ---------- Pied de page ---------- */
+    footer { text-align: center; padding: 28px; background: var(--vert-fonce); color: white; margin-top: 60px; }
+
+    @keyframes monte {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 950px) {
+      .recherche { grid-template-columns: repeat(2, 1fr); margin: -50px 5% 0; }
+      .grille { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 600px) {
+      .recherche { grid-template-columns: 1fr; }
+      .grille { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="logo">Maison<span>CI</span></div>
+    <button class="fav-lien" id="btnFavoris">❤ Mes favoris (<span id="nbFav">0</span>)</button>
+  </header>
+
+  <div class="hero">
+    <h1>Trouvez la maison de vos rêves en Côte d'Ivoire</h1>
+    <p>Achat ou location à Abidjan, Yamoussoukro, Bouaké, San-Pédro et partout dans le pays.</p>
+  </div>
+
+  <!-- Recherche -->
+  <div class="recherche">
+    <div>
+      <label for="fOffre">Je veux</label>
+      <select id="fOffre">
+        <option value="">Acheter ou louer</option>
+        <option value="achat">Acheter</option>
+        <option value="location">Louer</option>
+      </select>
+    </div>
+    <div>
+      <label for="fVille">Ville</label>
+      <select id="fVille">
+        <option value="">Toutes les villes</option>
+        <option>Abidjan</option>
+        <option>Yamoussoukro</option>
+        <option>Bouaké</option>
+        <option>San-Pédro</option>
+        <option>Grand-Bassam</option>
+        <option>Korhogo</option>
+      </select>
+    </div>
+    <div>
+      <label for="fType">Type de bien</label>
+      <select id="fType">
+        <option value="">Tous les types</option>
+        <option>Villa</option>
+        <option>Maison</option>
+        <option>Appartement</option>
+        <option>Duplex</option>
+        <option>Studio</option>
+      </select>
+    </div>
+    <div>
+      <label for="fChambres">Chambres (min.)</label>
+      <select id="fChambres">
+        <option value="0">Peu importe</option>
+        <option value="1">1+</option>
+        <option value="2">2+</option>
+        <option value="3">3+</option>
+        <option value="4">4+</option>
+      </select>
+    </div>
+    <div>
+      <label for="fPrix">Budget max. (FCFA)</label>
+      <input type="number" id="fPrix" min="0" placeholder="Ex : 50000000">
+    </div>
+    <button class="btn-reset" id="btnReset">Réinitialiser les filtres</button>
+  </div>
+
+  <main>
+    <div class="barre-resultats">
+      <h2><span id="nbResultats">0</span> logement(s) trouvé(s)</h2>
+      <select id="fTri">
+        <option value="">Trier par...</option>
+        <option value="asc">Prix croissant</option>
+        <option value="desc">Prix décroissant</option>
+      </select>
+    </div>
+    <div class="grille" id="grille"></div>
+  </main>
+
+  <footer>
+    <p>© 2026 MaisonCI. Tous droits réservés.</p>
+  </footer>
+
+  <script>
+    // ---------- Données (tu peux ajouter tes propres logements ici) ----------
+    const logements = [
+      { id: 1,  titre: "Villa moderne avec piscine", ville: "Abidjan", quartier: "Cocody", type: "Villa", offre: "achat", prix: 85000000, chambres: 5, surface: 220, img: "https://picsum.photos/id/1048/600/400", tel: "+225 01 40 80  19" },
+      { id: 2,  titre: "Appartement lumineux", ville: "Abidjan", quartier: "Marcory", type: "Appartement", offre: "location", prix: 250000, chambres: 3, surface: 85, img: "https://picsum.photos/id/1031/600/400", tel: "+225 01 40 80 86 19" },
+      { id: 3,  titre: "Maison familiale avec jardin", ville: "Abidjan", quartier: "Bingerville", type: "Maison", offre: "achat", prix: 60000000, chambres: 4, surface: 150, img: "https://picsum.photos/id/1068/600/400", tel: "+225 01 40 80 86 19" },
+      { id: 4,  titre: "Duplex de standing", ville: "Abidjan", quartier: "Riviera", type: "Duplex", offre: "achat", prix: 72000000, chambres: 4, surface: 190, img: "https://picsum.photos/id/164/600/400", tel: "+225 01 40 80 86 19 " },
+      { id: 5,  titre: "Studio meublé", ville: "Abidjan", quartier: "Yopougon", type: "Studio", offre: "location", prix: 120000, chambres: 1, surface: 35, img: "https://picsum.photos/id/1040/600/400", tel: "+225 01 40 80 86 19 " },
+      { id: 6,  titre: "Villa avec grand terrain", ville: "Yamoussoukro", quartier: "Centre", type: "Villa", offre: "achat", prix: 48000000, chambres: 4, surface: 200, img: "https://picsum.photos/id/1039/600/400", tel: "+225 01 40 80 86 19 " },
+      { id: 7,  titre: "Maison de 3 chambres", ville: "Bouaké", quartier: "Air France", type: "Maison", offre: "location", prix: 150000, chambres: 3, surface: 110, img: "https://picsum.photos/id/1029/600/400", tel: "+225 01 40 80 86 19 " },
+      { id: 8,  titre: "Villa en bord de mer", ville: "Grand-Bassam", quartier: "Quartier France", type: "Villa", offre: "achat", prix: 95000000, chambres: 5, surface: 260, img: "https://picsum.photos/id/1067/600/400", tel: "+225 01 40 80 86 19 " },
+      { id: 9,  titre: "Appartement neuf", ville: "San-Pédro", quartier: "Bardot", type: "Appartement", offre: "location", prix: 180000, chambres: 2, surface: 75, img: "https://picsum.photos/id/1056/600/400", tel: "+225 01 40 80 86 19  " },
+      { id: 10, titre: "Maison rénovée", ville: "Korhogo", quartier: "Soba", type: "Maison", offre: "achat", prix: 28000000, chambres: 3, surface: 120, img: "https://picsum.photos/id/1076/600/400", tel: "+225 01 40 80 86 19 " },
+      { id: 11, titre: "Duplex avec terrasse", ville: "Abidjan", quartier: "Angré", type: "Duplex", offre: "location", prix: 450000, chambres: 4, surface: 180, img: "https://picsum.photos/id/1070/600/400", tel: "+225 01 40 80 86 19 " },
+      { id: 12, titre: "Appartement au Plateau", ville: "Abidjan", quartier: "Plateau", type: "Appartement", offre: "achat", prix: 38000000, chambres: 3, surface: 95, img: "https://picsum.photos/id/1062/600/400", tel: "+225 01 40 80 86 19 " }
+    ];
+
+    // ---------- Éléments de la page ----------
+    const grille = document.getElementById("grille");
+    const nbResultats = document.getElementById("nbResultats");
+    const nbFav = document.getElementById("nbFav");
+    const filtres = ["fOffre", "fVille", "fType", "fChambres", "fPrix", "fTri"];
+    let favoris = [];
+    let afficherFavoris = false;
+
+    const formatPrix = (n, offre) =>
+      n.toLocaleString("fr-FR") + " FCFA" + (offre === "location" ? " / mois" : "");
+
+    // ---------- Affichage ----------
+    function afficher() {
+      const offre = document.getElementById("fOffre").value;
+      const ville = document.getElementById("fVille").value;
+      const type = document.getElementById("fType").value;
+      const chambres = parseInt(document.getElementById("fChambres").value, 10);
+      const prixMax = parseInt(document.getElementById("fPrix").value, 10);
+      const tri = document.getElementById("fTri").value;
+
+      let liste = logements.filter(l =>
+        (!offre || l.offre === offre) &&
+        (!ville || l.ville === ville) &&
+        (!type || l.type === type) &&
+        l.chambres >= chambres &&
+        (isNaN(prixMax) || l.prix <= prixMax) &&
+        (!afficherFavoris || favoris.includes(l.id))
+      );
+
+      if (tri === "asc") liste.sort((a, b) => a.prix - b.prix);
+      if (tri === "desc") liste.sort((a, b) => b.prix - a.prix);
+
+      nbResultats.textContent = liste.length;
+
+      if (liste.length === 0) {
+        grille.innerHTML = '<div class="vide">Aucun logement ne correspond à votre recherche. Essayez d\'élargir vos filtres.</div>';
+        return;
+      }
+
+      grille.innerHTML = liste.map(l => `
+        <div class="carte">
+          <img src="${l.img}" alt="${l.titre}" loading="lazy">
+          <span class="badge ${l.offre}">${l.offre === "achat" ? "À vendre" : "À louer"}</span>
+          <button class="coeur" onclick="basculerFavori(${l.id})" aria-label="Favori">
+            ${favoris.includes(l.id) ? "❤️" : "🤍"}
+          </button>
+          <div class="contenu">
+            <h3>${l.titre}</h3>
+            <p class="lieu">📍 ${l.quartier}, ${l.ville}</p>
+            <p class="prix">${formatPrix(l.prix, l.offre)}</p>
+            <div class="infos">
+              <span>🛏 ${l.chambres} chambre(s)</span>
+              <span>📐 ${l.surface} m²</span>
+              <span>🏠 ${l.type}</span>
+            </div>
+            <a class="btn" target="_blank"
+               href="https://wa.me/${l.tel}?text=Bonjour, je suis intéressé par : ${encodeURIComponent(l.titre)} (${l.quartier}, ${l.ville})">
+              Contacter sur WhatsApp
+            </a>
+          </div>
+        </div>
+      `).join("");
+    }
+
+    // ---------- Favoris ----------
+    function basculerFavori(id) {
+      favoris = favoris.includes(id) ? favoris.filter(f => f !== id) : [...favoris, id];
+      nbFav.textContent = favoris.length;
+      afficher();
+    }
+
+    document.getElementById("btnFavoris").addEventListener("click", () => {
+      afficherFavoris = !afficherFavoris;
+      document.getElementById("btnFavoris").style.background = afficherFavoris ? "var(--vert)" : "none";
+      document.getElementById("btnFavoris").style.color = afficherFavoris ? "white" : "var(--texte)";
+      afficher();
+    });
+
+    // ---------- Réinitialiser ----------
+    document.getElementById("btnReset").addEventListener("click", () => {
+      filtres.forEach(id => {
+        const el = document.getElementById(id);
+        el.value = el.tagName === "SELECT" ? el.options[0].value : "";
+      });
+      afficherFavoris = false;
+      document.getElementById("btnFavoris").style.background = "none";
+      document.getElementById("btnFavoris").style.color = "var(--texte)";
+      afficher();
+    });
+
+    // ---------- Écoute des filtres ----------
+    filtres.forEach(id => {
+      document.getElementById(id).addEventListener("input", afficher);
+    });
+
+    afficher();
+  </script>
+
+</body>
+</html>
